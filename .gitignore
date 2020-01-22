@@ -1,6 +1,9 @@
 # compiled files
 *.pyc
 
+# vim swap files 
+*.swp
+
 # backup files
 *.bak
 
