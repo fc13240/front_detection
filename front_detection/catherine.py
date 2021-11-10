@@ -11,13 +11,14 @@ def fronts_for_date(latGrid, lonGrid, year, month, day, hour):
     cf = np.zeros(latGrid.shape)
 
     # get list of files in the folder
-    c_folder = '/mnt/drive1/processed_data/MERRA2fronts/%04d%02d/'%(year, month)
-
+    c_folder = '/Users/xxxx/Downloads/merra2fronts2017/%04d%02d/'%(year, month)
+    print(c_folder)
     # select date
     selectDate = '%04d%02d%02d'%(year, month, day)
-
+    print(selectDate)
     # string to search in the main c_folder (YYYY/MM folder)
     search_string = os.path.join(c_folder, '*%s_%02d*.ncdf'%(selectDate, hour))
+    print(search_string)
     c_files = glob.glob(search_string)
    
     # if no files are found
