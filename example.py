@@ -1,4 +1,6 @@
+# encoding: utf-8
 #!/usr/bin/env python
+
 import numpy as np 
 import front_detection as fd
 from front_detection import catherine
@@ -11,42 +13,54 @@ from mpl_toolkits.basemap import Basemap
 import datetime as dt
 import plotter
 
-year = 2007
+year = 2017
 model_name = 'merra2'
 hemis = 'NH'
 
-folder_format = '/localdrive/drive10/jj/datacycs/out_nc/{0}/{1}/{2}/' 
+#folder_format = '/Users/xxx/Downloads/front_detection-master/out_nc/{0}/{1}/{2}/' 
 
-model_folder = '/mnt/drive5/merra2/six_hrly/'
+#model_folder = '/Users/xxx/Downloads/front_detection-master/'
 
-print('Debug: Reading in data ...', end='')
+print('Debug: Reading in data ...')
 
-slv_file = '/mnt/drive5/merra2/six_hrly/MERRA_%d_slv.nc'%(year)
-slv_2_file = '/mnt/drive5/merra2/six_hrly/MERRA_%d_slv_2.nc'%(year)
-slv_id = Dataset(slv_file, 'r')
-slv_id.set_auto_mask(False)
-my_lat = slv_id.variables['lat'][:]
-my_lon = slv_id.variables['lon'][:]
-my_slp = slv_id.variables['slp'][:]/100.
-my_time = slv_id.variables['time'][:]
-my_date = np.asarray([dt.datetime.fromordinal(int(i_time - 366.)) + dt.timedelta(hours=(i_time%1)*24.) for i_time in my_time])
-my_lon, my_lat = np.meshgrid(my_lon, my_lat)
-slv_id.close()
+#slv_file = '/Users/xxx/Downloads/front_detection-master/MERRA2_400.tavg1_2d_slv_Nx.20170101.nc4'
+#slv_2_file = '/Users/xxx/Downloads/front_detection-master/MERRA2_400.tavg1_2d_slv_Nx.20170101.nc4'
+
+
+
+####slv_id = Dataset(slv_file, 'r')
+####print(slv_id.variables.keys())
+####for m in slv_id.variables.keys():
+####    print(m)
+####print("\n\n")
+####slv_id.set_auto_mask(False)
+####my_lat = slv_id.variables['lat'][:]
+####my_lon = slv_id.variables['lon'][:]
+####my_slp = slv_id.variables['slp'][:]/100.
+####my_time = slv_id.variables['time'][:]
+####my_date = np.asarray([dt.datetime.fromordinal(int(i_time - 366.)) + dt.timedelta(hours=(i_time%1)*24.) for i_time in my_time])
+####my_lon, my_lat = np.meshgrid(my_lon, my_lat)
+####slv_id.close()
 
 
 # loading in merra2 inst6_3d_ana_Np data
-ncid = Dataset('/localdrive/drive10/merra2/inst6_3d_ana_Np/MERRA2_300.inst6_3d_ana_Np.20070101.nc4', 'r')
+ncid = Dataset('/Users/xxx/Downloads/front_detection-master/MERRA2_400.inst6_3d_ana_Np.20170101.nc4', 'r')
+print(ncid)
+print(ncid.variables.keys())
+for m in ncid.variables.keys():
+    print(m)
+    print(ncid.variables[m])
 ncid.set_auto_mask(False)
 in_lon = ncid.variables['lon'][:]
 in_lat = ncid.variables['lat'][:]
-in_lev = ncid.variables['lev'][:]
+in_lev = ncid.variables['lev'][:]  #水平面气压
 in_time = np.asarray(ncid.variables['time'][:], dtype=float)
 
-in_slp = ncid.variables['SLP']
-T = ncid.variables['T']
-U = ncid.variables['U']
-V = ncid.variables['V']
-geoH = ncid.variables['H']
+in_slp = ncid.variables['SLP']  #海平面气压
+T = ncid.variables['T']  #温度
+U = ncid.variables['U']  #U风
+V = ncid.variables['V']  #V风
+geoH = ncid.variables['H']  #海拔高度
 
 # creating the cdt grid 
 lon, lat = np.meshgrid(in_lon, in_lat)
@@ -58,8 +72,8 @@ print(' Completed!')
 for t_step in range(1, in_time.shape[0]):
 
   # creating a datetime variable for the current time step
-  date = dt.datetime(2007, 1, 1) + dt.timedelta(minutes=in_time[t_step])
-
+  date = dt.datetime(2017, 1, 1) + dt.timedelta(minutes=in_time[t_step])
+  print(lat, lon, date.year, date.month, date.day, date.hour)
   # getting catherinees fronts for the time step
   cath_wf, cath_cf, cath_slp, cath_lat, cath_lon = catherine.fronts_for_date(lat, lon, date.year, date.month, date.day, date.hour)
   
@@ -69,7 +83,7 @@ for t_step in range(1, in_time.shape[0]):
   ulon = np.nanmax(cath_lon)
 
   # getting the different slp values for MERRA2
-  my_t_slp = np.squeeze(my_slp[(my_date == date), :, :])
+  ##my_t_slp = np.squeeze(my_slp[(my_date == date), :, :])
   slp = in_slp[t_step, :, :]/100.
 
   # plt.figure(figsize=(3,9))
